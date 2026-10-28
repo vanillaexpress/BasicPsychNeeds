@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Psychological Needs Profile</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one 760px workbench column. Header and two tabs on top. The questionnaire runs
+   as four pages of six statements; results show a quadrant plot, then three need cards
+   ordered by priority. Need colours mark the three needs, state pills carry meaning. */
+:root{
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Public Sans","Segoe UI",system-ui,sans-serif;
+  --font-data:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --bg:#F2F6F7; --surface:#FFFFFF; --fg:#13222A; --muted:#566A73; --line:#D3DEE2; --wash:#E8EFF1;
+  --accent:#0F6B75; --accent-ink:#FFFFFF;
+  --aut:#2E57C9; --aut-soft:#E3EAFB;
+  --com:#9C5209; --com-soft:#FBEBD8;
+  --rel:#A92E68; --rel-soft:#F8E1EC;
+  --on-need:#FFFFFF;
+  --good:#1F7A4D; --good-soft:#DDF1E6;
+  --warn:#8A5A00; --warn-soft:#FBEFCF;
+  --bad:#B3321F; --bad-soft:#FADFDA;
+  --neutral-soft:#E6ECEE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E171B; --surface:#16232A; --fg:#E6EEF1; --muted:#93A6AE; --line:#2A3C45; --wash:#1D2D35;
+    --accent:#4FC1CC; --accent-ink:#08171B;
+    --aut:#8DA8FF; --aut-soft:#1E2B52;
+    --com:#F2A64F; --com-soft:#3D2A12;
+    --rel:#F28BB4; --rel-soft:#46182F;
+    --on-need:#0E171B;
+    --good:#5CCB90; --good-soft:#15382A;
+    --warn:#E3B24D; --warn-soft:#3A2D0E;
+    --bad:#FF8A78; --bad-soft:#47201A;
+    --neutral-soft:#22333B;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E171B; --surface:#16232A; --fg:#E6EEF1; --muted:#93A6AE; --line:#2A3C45; --wash:#1D2D35;
+  --accent:#4FC1CC; --accent-ink:#08171B;
+  --aut:#8DA8FF; --aut-soft:#1E2B52;
+  --com:#F2A64F; --com-soft:#3D2A12;
+  --rel:#F28BB4; --rel-soft:#46182F;
+  --on-need:#0E171B;
+  --good:#5CCB90; --good-soft:#15382A;
+  --warn:#E3B24D; --warn-soft:#3A2D0E;
+  --bad:#FF8A78; --bad-soft:#47201A;
+  --neutral-soft:#22333B;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.55;margin:0;
+  padding-block:28px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.wrap{max-width:760px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15;letter-spacing:-.01em}
+h1{font-size:clamp(28px,5.5vw,40px);font-weight:700}
+h2{font-size:clamp(21px,3.6vw,26px);font-weight:700}
+h3{font-size:18px;font-weight:600}
+p{margin:0}
+ul,ol{margin:0;padding-left:1.2em}
+.eyebrow{font-family:var(--font-data);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.mono{font-family:var(--font-data);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+header.top .lead{color:var(--muted);max-width:62ch}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:22px}
+nav.tabs a{padding:10px 14px;color:var(--muted);text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+nav.tabs a[aria-current="page"]{color:var(--fg);border-bottom-color:var(--accent)}
+
+.stack{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.notice{background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:14px}
+.notice.warn{background:var(--warn-soft);border-color:var(--warn)}
+.btn{font:inherit;font-weight:600;border-radius:8px;padding:11px 18px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;min-height:44px}
+.btn.secondary{background:transparent;color:var(--accent)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.spacer{flex:1}
+
+.dot{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;font-family:var(--font-data);font-weight:500;font-size:14px;background:var(--nc-soft);color:var(--nc);flex:none}
+.n-autonomy{--nc:var(--aut);--nc-soft:var(--aut-soft)}
+.n-competence{--nc:var(--com);--nc-soft:var(--com-soft)}
+.n-relatedness{--nc:var(--rel);--nc-soft:var(--rel-soft)}
+
+.needlist{list-style:none;padding:0;display:flex;flex-direction:column;gap:12px;margin-block:14px 18px}
+.needlist li{display:flex;gap:12px;align-items:flex-start}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;max-width:340px}
+.field label{font-weight:600;font-size:14px}
+select{font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg);min-height:44px}
+
+.progress{height:6px;background:var(--wash);border-radius:99px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s ease}
+.quiz-head{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+.keyline{font-family:var(--font-data);font-size:12px;color:var(--muted);line-height:1.7}
+.q{padding-block:18px;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.qtext{margin-bottom:12px;display:flex;gap:10px}
+.qn{font-family:var(--font-data);color:var(--muted);min-width:1.8em;flex:none}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.scale input{position:absolute;opacity:0;width:1px;height:1px}
+.scale label{display:flex;align-items:center;justify-content:center;min-height:46px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;font-family:var(--font-data);font-size:16px}
+.scale label:hover{border-color:var(--accent)}
+.scale input:checked + label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:500}
+.scale input:focus-visible + label{outline:2px solid var(--accent);outline-offset:2px}
+.ends{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:6px}
+
+.summary{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.score{display:flex;flex-direction:column;align-items:center;min-width:104px}
+.score-num{font-family:var(--font-display);font-weight:700;font-size:56px;line-height:1;font-variant-numeric:tabular-nums}
+.score-cap{font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+.summary-text{display:flex;flex-direction:column;gap:8px;min-width:0}
+.chart-wrap{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.chart-wrap svg{width:100%;max-width:480px;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend .dot{width:22px;height:22px;font-size:12px;background:var(--nc);color:var(--on-need)}
+
+svg .q-thriving{fill:var(--good-soft)} svg .q-mixed{fill:var(--warn-soft)}
+svg .q-unmet{fill:var(--neutral-soft)} svg .q-thwarted{fill:var(--bad-soft)}
+svg .grid{stroke:var(--line);stroke-width:1;fill:none}
+svg .cut{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:4 3;fill:none}
+svg .axis{stroke:var(--muted);stroke-width:1;fill:none}
+svg text{fill:var(--muted);font-family:var(--font-data);font-size:10px}
+svg text.ql{font-size:9px;letter-spacing:.06em;text-transform:uppercase}
+svg text.at{font-size:10.5px;fill:var(--fg)}
+svg .pt{stroke:var(--surface);stroke-width:2}
+svg .pt-autonomy{fill:var(--aut)} svg .pt-competence{fill:var(--com)} svg .pt-relatedness{fill:var(--rel)}
+svg text.pl{fill:var(--on-need);font-size:11px;font-weight:500}
+
+.need{display:flex;flex-direction:column;gap:14px}
+.need-head{display:flex;gap:12px;align-items:center}
+.need-head .ttl{flex:1;min-width:0}
+.pill{font-size:13px;font-weight:600;padding:3px 11px;border-radius:99px;white-space:nowrap}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.neutral{background:var(--neutral-soft);color:var(--muted)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.need-score{display:flex;align-items:baseline;gap:8px}
+.need-score .big{font-family:var(--font-display);font-size:34px;font-weight:700;line-height:1}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:grid;grid-template-columns:96px 1fr 40px;gap:10px;align-items:center;font-size:14px}
+.bar{height:8px;background:var(--wash);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.bar.sat i{background:var(--nc)}
+.bar.fru i{background:var(--muted)}
+details summary{cursor:pointer;font-weight:600;font-size:14px;color:var(--accent)}
+details ul{margin-top:8px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--font-data);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--wash)}
+tr:last-child td{border-bottom:0}
+pre.code{margin:0;overflow-x:auto;background:var(--wash);border:1px solid var(--line);border-radius:10px;padding:14px;font-family:var(--font-data);font-size:12.5px;line-height:1.6;tab-size:2}
+.steps{list-style:none;padding:0;display:flex;flex-direction:column;gap:16px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:34px 1fr;gap:12px;counter-increment:s}
+.steps li::before{content:counter(s);font-family:var(--font-data);width:30px;height:30px;border-radius:50%;background:var(--wash);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:13px}
+.steps li > div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.formula{font-family:var(--font-data);font-size:13.5px;background:var(--wash);border-radius:8px;padding:8px 12px;overflow-x:auto}
+textarea.json{width:100%;min-height:160px;font-family:var(--font-data);font-size:12px;background:var(--wash);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px}
+
+h4{font-family:var(--font-body);font-size:14px;font-weight:600;margin:0}
+.plain{padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+.profile-block{display:flex;flex-direction:column;gap:8px}
+.rec{display:flex;flex-direction:column;gap:14px;padding-left:1.3em;margin:0}
+.rec-how{display:block}
+.rec-why{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+.plan{display:flex;flex-direction:column;gap:18px}
+.plan-step{display:flex;flex-direction:column;gap:8px;padding-left:14px;border-left:3px solid var(--line)}
+.plan-step ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 9px;border-radius:99px;background:var(--nc-soft);color:var(--nc);margin-right:6px;white-space:nowrap}
+.notice.care{background:var(--bad-soft);border-color:var(--bad)}
+
+@media (max-width:520px){
+  .summary{grid-template-columns:1fr;justify-items:start}
+  .score{align-items:flex-start}
+  .score-cap{text-align:left}
+  .bar-row{grid-template-columns:84px 1fr 36px}
+  .scale{gap:6px}
+}
+@media (prefers-reduced-motion:reduce){.progress i{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Self-Determination Theory</p>
+    <h1>Psychological Needs Profile</h1>
+    <p class="lead">A 24-statement questionnaire that scores how well three basic psychological needs are supported, and how strongly each is being blocked.</p>
+  </header>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#questionnaire" id="tab-q">Questionnaire</a>
+    <a href="#method" id="tab-m">Scoring method</a>
+  </nav>
+  <main id="app" class="stack"></main>
+</div>
+
+<script>
+/* Psychological needs scoring core. Pure functions, no DOM.
+   Model: Self-Determination Theory. Three needs (autonomy, competence,
+   relatedness), each measured by a satisfaction subscale and a frustration
+   subscale of four items, answered on a 1 to 5 agreement scale. */
+
+const SCALE = [
+  { v: 1, label: "Strongly disagree" },
+  { v: 2, label: "Disagree" },
+  { v: 3, label: "Neutral" },
+  { v: 4, label: "Agree" },
+  { v: 5, label: "Strongly agree" }
+];
+
+const NEEDS = {
+  autonomy: { name: "Autonomy", initial: "A", tagline: "Acting from your own choice and values" },
+  competence: { name: "Competence", initial: "C", tagline: "Feeling effective and growing in skill" },
+  relatedness: { name: "Relatedness", initial: "R", tagline: "Feeling cared for and connected to others" }
+};
+
+const ITEMS = [
+  { id: "A1", need: "autonomy", pole: "satisfaction", text: "I feel free to decide how I spend most of my time." },
+  { id: "A2", need: "autonomy", pole: "satisfaction", text: "What I do day to day reflects what I actually care about." },
+  { id: "A3", need: "autonomy", pole: "satisfaction", text: "I can say what I really think without holding back." },
+  { id: "A4", need: "autonomy", pole: "satisfaction", text: "When I take something on, it is because I chose it." },
+  { id: "A5", need: "autonomy", pole: "frustration", text: "I often feel pushed into things I would rather not do." },
+  { id: "A6", need: "autonomy", pole: "frustration", text: "Other people's expectations decide most of my choices." },
+  { id: "A7", need: "autonomy", pole: "frustration", text: "I feel controlled by pressure, rules, or the people around me." },
+  { id: "A8", need: "autonomy", pole: "frustration", text: "I have to hide parts of myself to get by." },
+  { id: "C1", need: "competence", pole: "satisfaction", text: "I feel capable at the things that matter to me." },
+  { id: "C2", need: "competence", pole: "satisfaction", text: "I get regular chances to use my skills." },
+  { id: "C3", need: "competence", pole: "satisfaction", text: "I can see myself getting better at what I work on." },
+  { id: "C4", need: "competence", pole: "satisfaction", text: "When I take on a challenge, I usually finish with a sense of achievement." },
+  { id: "C5", need: "competence", pole: "frustration", text: "I often doubt whether I am good enough at what I do." },
+  { id: "C6", need: "competence", pole: "frustration", text: "It feels like I keep failing at the things I try." },
+  { id: "C7", need: "competence", pole: "frustration", text: "I feel overwhelmed by what is expected of me." },
+  { id: "C8", need: "competence", pole: "frustration", text: "My effort rarely seems to lead to progress." },
+  { id: "R1", need: "relatedness", pole: "satisfaction", text: "I feel close to at least a few people." },
+  { id: "R2", need: "relatedness", pole: "satisfaction", text: "The people around me care how I am doing." },
+  { id: "R3", need: "relatedness", pole: "satisfaction", text: "I feel that I belong to a group or community." },
+  { id: "R4", need: "relatedness", pole: "satisfaction", text: "I can be myself with the people who matter to me." },
+  { id: "R5", need: "relatedness", pole: "frustration", text: "I often feel lonely, even when I am around others." },
+  { id: "R6", need: "relatedness", pole: "frustration", text: "I feel left out by the people around me." },
+  { id: "R7", need: "relatedness", pole: "frustration", text: "My relationships feel distant or superficial." },
+  { id: "R8", need: "relatedness", pole: "frustration", text: "I sense that people around me do not really care about me." }
+];
+
+const CONFIG = {
+  SAT_HIGH: 3.5,      // satisfaction mean at or above this counts as "high"
+  FRU_HIGH: 3.25,     // frustration mean at or above this counts as "elevated"
+  CARE_F: 4,          // a thwarted need with frustration at or above this, and satisfaction at or below CARE_S, triggers the support note
+  CARE_S: 2.5,
+  CARE_INDEX: 25,     // an overall index below this also triggers the support note
+  MISMATCH_MAX: 1.5,  // mean satisfaction/frustration disagreement before a consistency flag
+  OVERALL_BANDS: [
+    { min: 70, label: "Well supported" },
+    { min: 55, label: "Mostly supported" },
+    { min: 40, label: "Mixed support" },
+    { min: 0, label: "Under strain" }
+  ]
+};
+
+function scoreResponses(responses, cfg = CONFIG) {
+  // 1. Validate: every item needs an integer from 1 to 5.
+  const missing = ITEMS.filter(i => {
+    const v = responses[i.id];
+    return !Number.isInteger(v) || v < 1 || v > 5;
+  }).map(i => i.id);
+  if (missing.length) return { complete: false, missing };
+
+  const mean = a => a.reduce((s, x) => s + x, 0) / a.length;
+
+  // 2. Subscale means, then per-need indices and state.
+  const needs = {};
+  for (const key of Object.keys(NEEDS)) {
+    const pick = pole => ITEMS.filter(i => i.need === key && i.pole === pole).map(i => responses[i.id]);
+    const S = mean(pick("satisfaction"));
+    const F = mean(pick("frustration"));
+    const satHigh = S >= cfg.SAT_HIGH;
+    const fruHigh = F >= cfg.FRU_HIGH;
+    needs[key] = {
+      key, S, F,
+      fulfilment: ((S - F + 4) / 8) * 100,   // 0 to 100, 50 = satisfaction equals frustration
+      gap: ((5 - S) + (F - 1)) / 8,          // 0 to 1, larger = more need for attention
+      state: satHigh ? (fruHigh ? "mixed" : "thriving") : (fruHigh ? "thwarted" : "unmet"),
+      mismatch: Math.abs(S - (6 - F))        // 0 when the two subscales mirror each other
+    };
+  }
+  const list = Object.values(needs);
+
+  // 3. Priority order: largest gap first, ties go to the lower satisfaction.
+  const ranking = list.slice().sort((a, b) => b.gap - a.gap || a.S - b.S).map(n => n.key);
+  const focus = ranking.find(k => needs[k].state !== "thriving") || null;
+
+  // 4. Overall index and headline.
+  const index = mean(list.map(n => n.fulfilment));
+  const band = cfg.OVERALL_BANDS.find(b => index >= b.min).label;
+  const thwarted = list.filter(n => n.state === "thwarted");
+  let headline;
+  if (thwarted.length >= 2) headline = "Several needs are under strain";
+  else if (thwarted.length === 1) headline = NEEDS[thwarted[0].key].name + " is under strain";
+  else if (focus) headline = NEEDS[focus].name + " has the most room to grow";
+  else headline = "All three needs are well supported";
+
+  // 5. Response quality flags.
+  const flags = [];
+  const values = ITEMS.map(i => responses[i.id]);
+  if (values.every(v => v === values[0])) flags.push("straightLining");
+  if (mean(list.map(n => n.mismatch)) > cfg.MISMATCH_MAX) flags.push("inconsistent");
+
+  return { complete: true, needs, ranking, focus, overall: { index, band }, headline, flags };
+}
+
+function reliability(dataset) {
+  // dataset: array of response objects, one per person. Returns Cronbach's alpha
+  // for each of the six subscales (aim for 0.70 or higher).
+  const variance = a => {
+    const m = a.reduce((s, x) => s + x, 0) / a.length;
+    return a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - 1);
+  };
+  const out = {};
+  for (const need of Object.keys(NEEDS)) {
+    for (const pole of ["satisfaction", "frustration"]) {
+      const ids = ITEMS.filter(i => i.need === need && i.pole === pole).map(i => i.id);
+      const k = ids.length;
+      const itemVar = ids.map(id => variance(dataset.map(r => r[id])));
+      const totalVar = variance(dataset.map(r => ids.reduce((s, id) => s + r[id], 0)));
+      out[need + "." + pole] = totalVar === 0
+        ? null
+        : (k / (k - 1)) * (1 - itemVar.reduce((s, v) => s + v, 0) / totalVar);
+    }
+  }
+  return out;
+}
+
+/* ---------- Written profile ---------- */
+
+// One recommendation per statement. It is shown when that statement is a pressure point:
+// a frustration statement answered 4 or 5, or a satisfaction statement answered 1 or 2.
+const ITEM_ADVICE = {
+  A1: "Block out a few hours each week that belong to you, and protect them the way you would protect a meeting.",
+  A2: "Write down your three most important values and compare them with this week's calendar. Swap one low-value task for something that matches them.",
+  A3: "Share one honest opinion a day in a low-risk setting, then work up to harder conversations.",
+  A4: "Before you agree to a request, wait a day and ask whether you would choose it if nobody were asking.",
+  A5: "List what you are doing out of pressure. Pick one item and renegotiate it, hand it off, or set a firm limit.",
+  A6: "Sort expectations into those you share and those you inherited. Keep the first group and talk the second through with someone you trust.",
+  A7: "Find the part of the situation you do control, such as the order, timing or method, and use it. Ask for the reason behind rules, which often opens room to adjust them.",
+  A8: "Choose one setting where you can be more open and share one thing you usually keep back. Look for groups where that is welcome.",
+  C1: "Keep a weekly log of what you finished. A written record counters the habit of discounting your own progress.",
+  C2: "Ask for or create one task a week that uses your strongest skill, or take on a small project outside your routine.",
+  C3: "Pick one skill, set a target slightly above your current level, and measure it once a month.",
+  C4: "Split larger challenges into pieces you can finish in one sitting and mark each one done.",
+  C5: "Ask someone whose work you respect for specific feedback on one piece of your work. Concrete feedback beats guessing.",
+  C6: "Look at your last three setbacks for a repeating cause: an unclear goal, a missing skill, or too little support. Fix the cause that repeats.",
+  C7: "Write out what is actually expected of you and check it with whoever sets the expectations. Agree on what comes first and what can wait.",
+  C8: "Choose a measure that shows progress every week. If it stays flat for three weeks, change your approach.",
+  R1: "Set up recurring contact with one or two people at a fixed time each week.",
+  R2: "Tell one person how you are really doing this week. Care is easier to receive when people know what is going on.",
+  R3: "Join a group built around a shared activity, so contact has a reason and repeats.",
+  R4: "Share something personal with someone you trust, beyond news and logistics.",
+  R5: "Move one conversation from small talk to something that matters to you, and look for spaces where people talk about shared interests.",
+  R6: "Make the first invitation yourself to one person. Many people wait to be asked.",
+  R7: "Choose one relationship to deepen. Ask open questions and set regular time together.",
+  R8: "Write down moments when someone showed care, however small. If very few come up, think about whether these are the right circles for you, and consider talking it over with someone you trust or a counsellor."
+};
+
+const KEEP = {
+  autonomy: "Your sense of choice is well supported. Keep the routines and agreements that protect it, and notice early if a new role, boss or commitment starts to take decisions out of your hands.",
+  competence: "Your sense of effectiveness is well supported. Keep setting goals slightly above your current level and keep asking for feedback so that growth continues.",
+  relatedness: "Your connection to others is well supported. Keep up the regular contact that sustains it, and protect that time during busy periods, which is when it tends to slip."
+};
+
+// Keyed by the needs that are not thriving, sorted alphabetically and joined with a comma.
+const PATTERNS = {
+  "none": {
+    label: "Well supported",
+    text: "All three needs are well supported and rarely blocked. In Self-Determination Theory research this combination goes with steadier motivation, better well-being and more resilience under stress. The useful question now is how to protect the conditions that produce it."
+  },
+  "autonomy": {
+    label: "Capable and connected, short on choice",
+    text: "Your sense of effectiveness and your relationships are in good shape, while your sense of choice is the weak point. This often shows up in roles or households where many demands are fixed and few decisions are yours. Because competence and connection are strong, you have both the skill and the support to renegotiate how things are done."
+  },
+  "competence": {
+    label: "Free and connected, still building confidence",
+    text: "You feel that your choices are your own and that people care about you, while your sense of being effective is lower. This often happens when you are learning something new, when goals are unclear, or when feedback is rare. Clear targets, specific feedback and small finished wins tend to move this need fastest."
+  },
+  "relatedness": {
+    label: "Independent and capable, short on connection",
+    text: "You feel in charge of your choices and effective at what you do, while closeness to other people is the gap. Busy, self-directed routines and solo or remote work can crowd out contact without anyone intending it. Closeness tends to build through regular, repeated contact more than through occasional big gestures."
+  },
+  "autonomy,competence": {
+    label: "Connected, but under pressure",
+    text: "Your relationships hold, while both your sense of choice and your sense of effectiveness are under strain. When other people set the terms and the standards, it is common to start doubting your own ability as well. Your relationships are a resource here, so use them to ask for more say in how things are done and for clearer feedback."
+  },
+  "autonomy,relatedness": {
+    label: "Capable, but controlled and distant",
+    text: "You feel effective at what you do, while choice and closeness are both lacking. Demanding or controlling settings can leave little time or energy for either. Gaining a little control over your time often frees room for relationships too, so autonomy is a sensible place to begin."
+  },
+  "competence,relatedness": {
+    label: "Free to choose, still finding footing",
+    text: "You have a sense of choice, while your effectiveness and your connection to others are both lower. This pattern is common during transitions such as a new city, job or school, when skills and relationships are still being built. It tends to improve with time and deliberate effort on both."
+  },
+  "autonomy,competence,relatedness": {
+    label: "Stretched across all three",
+    text: "All three needs have room to grow or are under strain at the same time. That is a lot to carry, so choose one need and one action instead of trying to change everything. Small steps repeated for a few weeks tend to work better than large changes."
+  }
+};
+
+const CARE_TEXT = "Your answers describe a lot of strain. A questionnaire cannot tell what is behind it, and talking with someone you trust, or with a qualified professional such as a doctor, counsellor or psychologist, can help. If you ever feel unsafe or think about harming yourself, contact your local emergency services or a crisis line in your country right away.";
+
+function buildProfile(res, responses, cfg = CONFIG) {
+  if (!res || !res.complete) return null;
+  const keys = Object.keys(NEEDS);
+  // Severity of one answer: 1 or more means the statement points at a problem.
+  const sev = i => (i.pole === "frustration" ? responses[i.id] - 3 : 3 - responses[i.id]);
+
+  // 1. Which needs are not thriving, in priority order, and the pattern they form.
+  const notThriving = res.ranking.filter(k => res.needs[k].state !== "thriving");
+  const patternKey = notThriving.length ? notThriving.slice().sort().join(",") : "none";
+  const pattern = PATTERNS[patternKey];
+
+  // 2. Item-level pressure points: top 3 for the priority need, top 2 for the others.
+  const needs = {};
+  notThriving.forEach((k, idx) => {
+    const ranked = ITEMS.filter(i => i.need === k).map(i => ({ item: i, s: sev(i) })).sort((a, b) => b.s - a.s);
+    let chosen = ranked.filter(r => r.s >= 1).slice(0, idx === 0 ? 3 : 2);
+    if (!chosen.length) chosen = ranked.filter(r => r.s >= 0).slice(0, 1);
+    needs[k] = {
+      state: res.needs[k].state,
+      actions: chosen.map(r => ({ id: r.item.id, why: r.item.text, how: ITEM_ADVICE[r.item.id] }))
+    };
+  });
+  keys.filter(k => res.needs[k].state === "thriving").forEach(k => {
+    needs[k] = { state: "thriving", actions: [], keep: KEEP[k] };
+  });
+
+  // 3. Strengths: the highest satisfaction answers, one per need where possible.
+  const sat = ITEMS.filter(i => i.pole === "satisfaction" && responses[i.id] >= 4)
+    .sort((a, b) => responses[b.id] - responses[a.id]);
+  const seen = new Set();
+  const strengths = [];
+  for (const i of sat) {
+    if (!seen.has(i.need) && strengths.length < 3) {
+      seen.add(i.need);
+      strengths.push(NEEDS[i.need].name + ": you " + (responses[i.id] === 5 ? "strongly agreed" : "agreed") + " that “" + i.text + "”");
+    }
+  }
+
+  // 4. Action plan, spread over the next few weeks.
+  const plan = [];
+  const [first, second, third] = notThriving;
+  const step = (k, a) => ({ need: k, how: a.how });
+  if (first) {
+    plan.push({ when: "This week", items: [step(first, needs[first].actions[0])] });
+    const next = needs[first].actions.slice(1).map(a => step(first, a));
+    if (second) next.push(step(second, needs[second].actions[0]));
+    if (next.length) plan.push({ when: "Over the next two weeks", items: next });
+    const later = [];
+    if (second) needs[second].actions.slice(1).forEach(a => later.push(step(second, a)));
+    if (third) needs[third].actions.forEach(a => later.push(step(third, a)));
+    if (later.length) plan.push({ when: "After that", items: later });
+  }
+
+  // 5. Support note for very low profiles.
+  const severe = keys.some(k => res.needs[k].state === "thwarted" && res.needs[k].F >= cfg.CARE_F && res.needs[k].S <= cfg.CARE_S);
+  const care = severe || res.overall.index < cfg.CARE_INDEX ? CARE_TEXT : null;
+
+  const summary = pattern.text + (res.focus
+    ? " The need to start with is " + NEEDS[res.focus].name.toLowerCase() + ", because it has the largest gap between satisfaction and frustration."
+    : "");
+
+  return {
+    label: pattern.label, patternKey, summary, strengths, needs, plan, care,
+    retake: "Retake the questionnaire in four to six weeks. Rising satisfaction and falling frustration for the need you worked on suggest the changes are helping."
+  };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { SCALE, NEEDS, ITEMS, CONFIG, scoreResponses, reliability, buildProfile, PATTERNS, ITEM_ADVICE, KEEP, CARE_TEXT };
+}
+
+</script>
+
+<script>
+(function(){
+  var $ = function(s, r){ return (r || document).querySelector(s); };
+  var app = $("#app");
+  var CONTEXTS = {
+    life:  { label: "Life overall", phrase: "your life overall" },
+    work:  { label: "Work or main project", phrase: "your work or main project" },
+    study: { label: "Studies", phrase: "your studies" }
+  };
+  var STATE = {
+    thriving: { label: "Thriving", cls: "good", text: "Well supported and rarely blocked. Protect the conditions that keep it that way." },
+    mixed:    { label: "Mixed", cls: "warn", text: "You get real satisfaction here and also feel blocked or pressured in the same area. The need is often met in some settings and thwarted in others, so look for where the strain comes from." },
+    unmet:    { label: "Unmet", cls: "neutral", text: "Little is blocking this need and little is feeding it. Routine and drift are common causes, and small changes often help." },
+    thwarted: { label: "Thwarted", cls: "bad", text: "Something in your circumstances is working against this need. In SDT research this pattern is linked most strongly to low motivation and low well-being, so it deserves attention first." }
+  };
+  var FLAGS = {
+    straightLining: "Every answer was the same, so the profile may not reflect real differences between statements. Consider retaking it and reading each one on its own.",
+    inconsistent: "Within the same need, your satisfaction and frustration answers pointed the same way (for example agreeing with both kinds of statement). Check that you read each statement as written before relying on the scores."
+  };
+  var SAMPLE = { A1:4,A2:4,A3:4,A4:3,A5:4,A6:3,A7:4,A8:3, C1:5,C2:4,C3:5,C4:4,C5:2,C6:1,C7:2,C8:2, R1:3,R2:3,R3:2,R4:3,R5:3,R6:2,R7:3,R8:3 };
+
+  // Fixed shuffle so the two kinds of statement and the three needs are interleaved.
+  function shuffle(arr, seed){
+    var a = arr.slice(), s = seed >>> 0;
+    function rnd(){ s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+    for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(rnd() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; }
+    return a;
+  }
+  var BYID = {}; ITEMS.forEach(function(i){ BYID[i.id] = i; });
+  var ORDER = shuffle(ITEMS.map(function(i){ return i.id; }), 2026);
+  var PER_PAGE = 6, PAGES = Math.ceil(ORDER.length / PER_PAGE);
+
+  var S = { view: "intro", page: 0, responses: {}, context: "life", sample: false };
+
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function r2(v){ return Math.round(v * 100) / 100; }
+  function pct(v){ return ((v - 1) / 4) * 100; }
+  function toTop(){ try { window.scrollTo(0, 0); } catch(e){} }
+
+  function route(){ return location.hash === "#method" ? "method" : "questionnaire"; }
+
+  function render(){
+    var m = route();
+    $("#tab-q").setAttribute("aria-current", m === "questionnaire" ? "page" : "false");
+    $("#tab-m").setAttribute("aria-current", m === "method" ? "page" : "false");
+    if (m === "method") return renderMethod();
+    if (S.view === "intro") return renderIntro();
+    if (S.view === "quiz") return renderQuiz();
+    return renderResults();
+  }
+
+  /* ---------- Intro ---------- */
+  function renderIntro(){
+    var needs = Object.keys(NEEDS).map(function(k){
+      var n = NEEDS[k];
+      return '<li class="n-' + k + '"><span class="dot">' + n.initial + '</span><div><strong>' + n.name + '</strong><br><span class="muted">' + n.tagline + '.</span></div></li>';
+    }).join("");
+    var opts = Object.keys(CONTEXTS).map(function(k){
+      return '<option value="' + k + '"' + (S.context === k ? " selected" : "") + '>' + CONTEXTS[k].label + '</option>';
+    }).join("");
+    app.innerHTML =
+      '<section class="card">' +
+        '<h2>Three needs, each measured two ways</h2>' +
+        '<p class="muted" style="margin-top:8px;max-width:60ch">Self-Determination Theory names three needs that support motivation and well-being. For each one you rate how well it is satisfied and how much it is frustrated, so the profile separates a need that is simply quiet from a need that is being blocked.</p>' +
+        '<ul class="needlist">' + needs + '</ul>' +
+        '<div class="field"><label for="ctx">Answer about</label><select id="ctx">' + opts + '</select></div>' +
+        '<div class="actions"><button class="btn" data-act="start" id="start">Start the questionnaire</button><button class="btn secondary" data-act="sample" id="sample">See a sample result</button></div>' +
+        '<p class="small muted" style="margin-top:14px">24 statements, about 4 minutes. Answers stay on this page and are not sent anywhere.</p>' +
+      '</section>';
+  }
+
+  /* ---------- Quiz ---------- */
+  function renderQuiz(){
+    var ids = ORDER.slice(S.page * PER_PAGE, (S.page + 1) * PER_PAGE);
+    var key = SCALE.map(function(s){ return s.v + " " + s.label; }).join("  ·  ");
+    var items = ids.map(function(id){
+      var it = BYID[id], n = ORDER.indexOf(id) + 1, cur = S.responses[id];
+      var radios = SCALE.map(function(s){
+        return '<input type="radio" name="q-' + id + '" id="' + id + '-' + s.v + '" value="' + s.v + '"' + (cur === s.v ? " checked" : "") + '>' +
+               '<label for="' + id + '-' + s.v + '"><span aria-hidden="true">' + s.v + '</span><span class="sr">' + s.v + ', ' + s.label + '</span></label>';
+      }).join("");
+      return '<div class="q"><p class="qtext" id="qt-' + id + '"><span class="qn">' + n + '</span><span>' + esc(it.text) + '</span></p>' +
+             '<div class="scale" role="radiogroup" aria-labelledby="qt-' + id + '">' + radios + '</div>' +
+             '<div class="ends" aria-hidden="true"><span>Strongly disagree</span><span>Strongly agree</span></div></div>';
+    }).join("");
+    app.innerHTML =
+      '<section class="card">' +
+        '<div class="quiz-head">' +
+          '<div class="progress" aria-hidden="true"><i id="bar"></i></div>' +
+          '<p class="small" id="meta" aria-live="polite"></p>' +
+          '<p class="small muted">Think about ' + CONTEXTS[S.context].phrase + ' over the past month. How true is each statement?</p>' +
+          '<p class="keyline">' + key + '</p>' +
+        '</div>' + items +
+        '<div class="actions" style="margin-top:8px">' +
+          '<button class="btn secondary" data-act="back" id="back">Back</button><span class="spacer"></span>' +
+          '<span class="small muted" id="hint"></span>' +
+          '<button class="btn" data-act="next" id="next">' + (S.page === PAGES - 1 ? "See my profile" : "Next") + '</button>' +
+        '</div>' +
+      '</section>';
+    updateQuizMeta();
+  }
+
+  function updateQuizMeta(){
+    var ids = ORDER.slice(S.page * PER_PAGE, (S.page + 1) * PER_PAGE);
+    var onPage = ids.filter(function(id){ return S.responses[id]; }).length;
+    var total = ORDER.filter(function(id){ return S.responses[id]; }).length;
+    $("#bar").style.width = (total / ORDER.length * 100) + "%";
+    $("#meta").textContent = "Page " + (S.page + 1) + " of " + PAGES + ". " + total + " of " + ORDER.length + " answered.";
+    $("#next").disabled = onPage < ids.length;
+    $("#hint").textContent = onPage < ids.length ? "Answer all " + ids.length + " to continue" : "";
+  }
+
+  /* ---------- Results ---------- */
+  function chartSVG(res){
+    var W = 360, H = 312, L = 46, R = 340, T = 14, B = 258;
+    var x = function(f){ return L + (f - 1) / 4 * (R - L); };
+    var y = function(s){ return B - (s - 1) / 4 * (B - T); };
+    var xt = x(CONFIG.FRU_HIGH), yt = y(CONFIG.SAT_HIGH);
+    var g = "";
+    g += '<rect class="q-thriving" x="' + L + '" y="' + T + '" width="' + (xt - L) + '" height="' + (yt - T) + '"/>';
+    g += '<rect class="q-mixed" x="' + xt + '" y="' + T + '" width="' + (R - xt) + '" height="' + (yt - T) + '"/>';
+    g += '<rect class="q-unmet" x="' + L + '" y="' + yt + '" width="' + (xt - L) + '" height="' + (B - yt) + '"/>';
+    g += '<rect class="q-thwarted" x="' + xt + '" y="' + yt + '" width="' + (R - xt) + '" height="' + (B - yt) + '"/>';
+    for (var v = 1; v <= 5; v++){
+      g += '<line class="grid" x1="' + x(v) + '" y1="' + T + '" x2="' + x(v) + '" y2="' + B + '"/>';
+      g += '<line class="grid" x1="' + L + '" y1="' + y(v) + '" x2="' + R + '" y2="' + y(v) + '"/>';
+      g += '<text x="' + x(v) + '" y="' + (B + 16) + '" text-anchor="middle">' + v + '</text>';
+      g += '<text x="' + (L - 8) + '" y="' + (y(v) + 3.5) + '" text-anchor="end">' + v + '</text>';
+    }
+    g += '<line class="cut" x1="' + xt + '" y1="' + T + '" x2="' + xt + '" y2="' + B + '"/>';
+    g += '<line class="cut" x1="' + L + '" y1="' + yt + '" x2="' + R + '" y2="' + yt + '"/>';
+    g += '<rect class="axis" x="' + L + '" y="' + T + '" width="' + (R - L) + '" height="' + (B - T) + '" style="fill:none"/>';
+    g += '<text class="ql" x="' + (L + 8) + '" y="' + (T + 16) + '">Thriving</text>';
+    g += '<text class="ql" x="' + (R - 8) + '" y="' + (T + 16) + '" text-anchor="end">Mixed</text>';
+    g += '<text class="ql" x="' + (L + 8) + '" y="' + (B - 8) + '">Unmet</text>';
+    g += '<text class="ql" x="' + (R - 8) + '" y="' + (B - 8) + '" text-anchor="end">Thwarted</text>';
+    g += '<text class="at" x="' + ((L + R) / 2) + '" y="' + (H - 8) + '" text-anchor="middle">Frustration (mean of 4 items)</text>';
+    g += '<text class="at" transform="rotate(-90 12 ' + ((T + B) / 2) + ')" x="12" y="' + ((T + B) / 2) + '" text-anchor="middle">Satisfaction (mean of 4 items)</text>';
+    var label = [];
+    Object.keys(NEEDS).forEach(function(k){
+      var n = res.needs[k];
+      g += '<circle class="pt pt-' + k + '" cx="' + x(n.F) + '" cy="' + y(n.S) + '" r="11"/>';
+      g += '<text class="pl" x="' + x(n.F) + '" y="' + (y(n.S) + 4) + '" text-anchor="middle">' + NEEDS[k].initial + '</text>';
+      label.push(NEEDS[k].name + " " + STATE[n.state].label.toLowerCase());
+    });
+    return '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Quadrant chart of satisfaction against frustration. ' + label.join(", ") + '.">' + g + '</svg>';
+  }
+
+  function renderResults(){
+    var responses = S.sample ? SAMPLE : S.responses;
+    var res = scoreResponses(responses);
+    var prof = buildProfile(res, responses);
+    var cards = res.ranking.map(function(k, idx){
+      var n = res.needs[k], st = STATE[n.state], pn = prof.needs[k];
+      var body = n.state === "thriving"
+        ? '<p>' + esc(pn.keep) + '</p>'
+        : '<div class="profile-block"><h4>Recommended steps</h4><ol class="rec">' + pn.actions.map(function(a){
+            return '<li><span class="rec-how">' + esc(a.how) + '</span><span class="rec-why">Based on your answer to “' + esc(a.why) + '”</span></li>';
+          }).join("") + '</ol></div>';
+      return '<article class="card need n-' + k + '">' +
+        '<div class="need-head"><span class="dot">' + NEEDS[k].initial + '</span>' +
+          '<div class="ttl"><h3>' + NEEDS[k].name + '</h3><p class="small muted">Priority ' + (idx + 1) + ' of 3</p></div>' +
+          '<span class="pill ' + st.cls + '">' + st.label + '</span></div>' +
+        '<div class="need-score"><span class="big mono">' + Math.round(n.fulfilment) + '</span><span class="small muted">fulfilment, out of 100</span></div>' +
+        '<div class="bars">' +
+          '<div class="bar-row"><span>Satisfaction</span><div class="bar sat"><i style="width:' + pct(n.S) + '%"></i></div><span class="mono">' + n.S.toFixed(2) + '</span></div>' +
+          '<div class="bar-row"><span>Frustration</span><div class="bar fru"><i style="width:' + pct(n.F) + '%"></i></div><span class="mono">' + n.F.toFixed(2) + '</span></div>' +
+        '</div>' +
+        '<p>' + st.text + '</p>' + body + '</article>';
+    }).join("");
+    var legend = Object.keys(NEEDS).map(function(k){
+      return '<span class="n-' + k + '"><span class="dot">' + NEEDS[k].initial + '</span>' + NEEDS[k].name + '</span>';
+    }).join("");
+    var flags = res.flags.map(function(f){ return '<div class="notice warn">' + FLAGS[f] + '</div>'; }).join("");
+    var banner = S.sample ? '<div class="notice">This is a sample result built from example answers, shown so you can see what the profile looks like. Take the questionnaire to get your own.</div>' : "";
+    var care = prof.care ? '<div class="notice care" role="note"><strong>Support.</strong> ' + esc(prof.care) + '</div>' : "";
+    var strengths = prof.strengths.length
+      ? '<div class="profile-block"><h4>What is working</h4><ul class="plain">' + prof.strengths.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + '</ul></div>' : "";
+    var profileCard = '<section class="card stack"><p class="eyebrow">Your profile</p><h2>' + esc(prof.label) + '</h2><p>' + esc(prof.summary) + '</p>' + strengths + '</section>';
+    var planCard = prof.plan.length
+      ? '<section class="card stack"><h2>Your plan</h2><p class="muted">Start small. One change that you keep up is worth more than several you drop.</p><div class="plan">' +
+        prof.plan.map(function(s){
+          return '<div class="plan-step"><h4>' + s.when + '</h4><ul>' + s.items.map(function(it){
+            return '<li><span class="tag n-' + it.need + '">' + NEEDS[it.need].name + '</span>' + esc(it.how) + '</li>';
+          }).join("") + '</ul></div>';
+        }).join("") + '</div><p class="small muted">' + esc(prof.retake) + '</p></section>'
+      : '<section class="card stack"><h2>Keeping it up</h2><p>Nothing needs fixing right now. ' + esc(prof.retake) + '</p></section>';
+    app.innerHTML =
+      banner + flags +
+      '<section class="card summary"><div class="score"><span class="score-num">' + Math.round(res.overall.index) + '</span><span class="score-cap">overall index, 0 to 100</span></div>' +
+        '<div class="summary-text"><p class="eyebrow">' + res.overall.band + (S.sample ? "" : " · " + CONTEXTS[S.context].label) + '</p><h2>' + res.headline + '</h2>' +
+        '<p class="muted">The index averages the three fulfilment scores. Needs below are ordered by how much attention they need first.</p></div></section>' +
+      care + profileCard +
+      '<section class="card chart-wrap"><h3>Where each need sits</h3>' + chartSVG(res) +
+        '<div class="legend">' + legend + '</div>' +
+        '<p class="small muted">Dashed lines mark the cut-offs that decide the state: satisfaction at ' + CONFIG.SAT_HIGH + ' and frustration at ' + CONFIG.FRU_HIGH + '. Higher and further left is better.</p></section>' +
+      cards + planCard +
+      '<section class="card stack"><div class="actions"><button class="btn secondary" data-act="copy" id="copy">Copy results as JSON</button>' +
+        '<button class="btn secondary" data-act="retake" id="retake">' + (S.sample ? "Take the questionnaire" : "Retake") + '</button><span class="small muted" id="copystatus" role="status"></span></div>' +
+        '<textarea class="json" id="jsonbox" readonly hidden aria-label="Results JSON"></textarea>' +
+        '<p class="small muted">A self-reflection tool built on Self-Determination Theory (Deci and Ryan). It gives a snapshot of how you feel right now and does not diagnose anything. If low mood or distress is affecting daily life, consider talking to a qualified professional.</p></section>';
+  }
+
+  function exportJSON(){
+    var responses = S.sample ? SAMPLE : S.responses;
+    var res = scoreResponses(responses), needs = {};
+    var prof = buildProfile(res, responses);
+    Object.keys(res.needs).forEach(function(k){
+      var n = res.needs[k];
+      needs[k] = { satisfaction: r2(n.S), frustration: r2(n.F), fulfilment: r2(n.fulfilment), gap: r2(n.gap), state: n.state };
+    });
+    return JSON.stringify({ context: S.sample ? "sample" : S.context, responses: responses, needs: needs, ranking: res.ranking,
+      overall: { index: r2(res.overall.index), band: res.overall.band }, flags: res.flags,
+      profile: { label: prof.label, summary: prof.summary, plan: prof.plan, supportNote: !!prof.care } }, null, 2);
+  }
+
+  /* ---------- Method ---------- */
+  function renderMethod(){
+    var rows = ITEMS.map(function(i){
+      return '<tr><td class="mono">' + i.id + '</td><td>' + NEEDS[i.need].name + '</td><td>' + i.pole + '</td><td>' + esc(i.text) + '</td></tr>';
+    }).join("");
+    var code = "const CONFIG = " + JSON.stringify(CONFIG, null, 2) + ";\n\n" + scoreResponses.toString() + "\n\n" + reliability.toString();
+    app.innerHTML =
+      '<section class="card stack"><h2>How the score is built</h2>' +
+        '<p class="muted">Each of the three needs has a satisfaction subscale and a frustration subscale of four statements each, answered from 1 (strongly disagree) to 5 (strongly agree). That gives 24 statements. The page runs the same code that is printed further down.</p>' +
+        '<ol class="steps">' +
+          '<li><div><h3>Check completeness</h3><p>Every statement needs a whole number from 1 to 5. If any are missing, the function returns the missing IDs and no score.</p></div></li>' +
+          '<li><div><h3>Average each subscale</h3><p>S is the mean of a need\'s four satisfaction items and F is the mean of its four frustration items, both from 1 to 5. Frustration items are kept as their own subscale instead of being reverse scored, because SDT research treats active thwarting as a separate signal from low satisfaction.</p></div></li>' +
+          '<li><div><h3>Compute the fulfilment index</h3><p class="formula">fulfilment = ((S − F + 4) / 8) × 100</p><p>It runs from 0 to 100. A value of 50 means satisfaction and frustration cancel out.</p></div></li>' +
+          '<li><div><h3>Classify the state</h3><p>Compare S with ' + CONFIG.SAT_HIGH + ' and F with ' + CONFIG.FRU_HIGH + '. Values at the cut-off count as high.</p>' +
+            '<div class="tablewrap"><table><thead><tr><th></th><th>Frustration below ' + CONFIG.FRU_HIGH + '</th><th>Frustration ' + CONFIG.FRU_HIGH + ' or more</th></tr></thead><tbody>' +
+            '<tr><td>Satisfaction ' + CONFIG.SAT_HIGH + ' or more</td><td><strong>Thriving</strong></td><td><strong>Mixed</strong></td></tr>' +
+            '<tr><td>Satisfaction below ' + CONFIG.SAT_HIGH + '</td><td><strong>Unmet</strong></td><td><strong>Thwarted</strong></td></tr></tbody></table></div></div></li>' +
+          '<li><div><h3>Rank by gap</h3><p class="formula">gap = ((5 − S) + (F − 1)) / 8</p><p>The gap runs from 0 (fully supported, no frustration) to 1. The need with the largest gap is the first priority, and ties go to the lower satisfaction score.</p></div></li>' +
+          '<li><div><h3>Overall index and headline</h3><p>The overall index is the mean of the three fulfilment scores, banded as 70 and above well supported, 55 to 69 mostly supported, 40 to 54 mixed support, and below 40 under strain. The headline names the thwarted needs if there are any, otherwise the highest-priority need that is not thriving.</p></div></li>' +
+          '<li><div><h3>Check response quality</h3><p>Two flags: every answer identical, and a mean mismatch above ' + CONFIG.MISMATCH_MAX + ' between S and the reversed F (6 − F) across the three needs, which catches agreeing or disagreeing with everything.</p></div></li>' +
+        '</ol></section>' +
+      '<section class="card stack"><h2>How the written profile is built</h2>' +
+        '<p class="muted">The profile text is assembled by rules, so the same answers always give the same profile and every recommendation can be traced to something the person said.</p>' +
+        '<ol class="steps">' +
+          '<li><div><h3>Name the pattern</h3><p>The needs that are not thriving are combined into one of eight patterns, from “Well supported” to “Stretched across all three”. Each pattern has a short description based on common findings in Self-Determination Theory research, worded as tendencies and not as facts about the person.</p></div></li>' +
+          '<li><div><h3>Find the pressure points</h3><p>Inside each need that is not thriving, every statement gets a severity: a frustration statement scores its rating minus 3, and a satisfaction statement scores 3 minus its rating. Statements with a severity of 1 or more are pressure points. The priority need shows its top 3 and the others show their top 2. If nothing reaches 1, the single highest statement is used.</p></div></li>' +
+          '<li><div><h3>Attach one recommendation per statement</h3><p>Each of the 24 statements has its own recommendation, and the page shows the statement it came from, so the person can see why it was suggested.</p></div></li>' +
+          '<li><div><h3>List strengths</h3><p>The highest satisfaction answers (4 or 5), one per need where possible, up to three.</p></div></li>' +
+          '<li><div><h3>Build the plan</h3><p>The priority need’s first recommendation goes in “This week”. Its other recommendations and the second need’s first one follow over the next two weeks, and the rest come after that.</p></div></li>' +
+          '<li><div><h3>Add a support note when needed</h3><p>A note about talking to someone appears when any thwarted need has frustration of ' + CONFIG.CARE_F + ' or more with satisfaction of ' + CONFIG.CARE_S + ' or less, or when the overall index is below ' + CONFIG.CARE_INDEX + '.</p></div></li>' +
+        '</ol></section>' +
+      '<section class="card stack"><h2>The 24 statements</h2><div class="tablewrap"><table><thead><tr><th>ID</th><th>Need</th><th>Subscale</th><th>Statement</th></tr></thead><tbody>' + rows + '</tbody></table></div></section>' +
+      '<section class="card stack"><h2>Scoring code</h2><p class="muted">The cut-offs are starting points chosen from the response scale. Collect at least 200 responses, check each subscale with Cronbach\'s alpha using the reliability function (aim for 0.70 or higher), and then set the cut-offs from your own percentiles.</p><pre class="code"><code>' + esc(code) + '</code></pre></section>' +
+      '<section class="notice">The statements are original wording written for this tool, following the SDT structure of satisfaction and frustration for each need. Scores are not comparable with published norms. For research use, take the validated Basic Psychological Need Satisfaction and Frustration Scale (Chen et al., 2015) under its terms of use.</section>';
+  }
+
+  /* ---------- Events ---------- */
+  app.addEventListener("click", function(e){
+    var b = e.target.closest("[data-act]"); if (!b) return;
+    var a = b.getAttribute("data-act");
+    if (a === "start"){ S.view = "quiz"; S.page = 0; S.sample = false; S.responses = {}; render(); toTop(); }
+    else if (a === "sample"){ S.view = "results"; S.sample = true; render(); toTop(); }
+    else if (a === "next"){ if (S.page < PAGES - 1){ S.page++; render(); } else { S.view = "results"; S.sample = false; render(); } toTop(); }
+    else if (a === "back"){ if (S.page > 0){ S.page--; render(); } else { S.view = "intro"; render(); } toTop(); }
+    else if (a === "retake"){ S.view = "intro"; S.sample = false; S.responses = {}; render(); toTop(); }
+    else if (a === "copy"){
+      var text = exportJSON(), status = $("#copystatus"), box = $("#jsonbox");
+      var done = function(ok){
+        status.textContent = ok ? "Copied." : "Copy was blocked. Select the text below.";
+        if (!ok){ box.hidden = false; box.value = text; box.focus(); box.select(); }
+      };
+      try { navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(false); }); } catch(err){ done(false); }
+    }
+  });
+  app.addEventListener("change", function(e){
+    var t = e.target;
+    if (t.matches && t.matches('input[type="radio"]')){
+      S.responses[t.name.slice(2)] = Number(t.value);
+      updateQuizMeta();
+    } else if (t.id === "ctx"){ S.context = t.value; }
+  });
+  window.addEventListener("hashchange", function(){ render(); toTop(); });
+  render();
+})();
+</script>
+
+</body>
+</html>
